@@ -27,6 +27,11 @@ namespace Editor
                 f.floatValue = 0.1f;
             }
             
+            if (z.floatValue <= 0.1f)
+            {
+                z.floatValue = 0.1f;
+            }
+            
             EditorGUI.indentLevel = indent;
             EditorGUI.EndProperty();
         }

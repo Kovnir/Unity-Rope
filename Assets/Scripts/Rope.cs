@@ -33,7 +33,6 @@ namespace DefaultNamespace
         [ContextMenu("Init Dynamics")]
         void InitDynamics()
         {
-            dynamicsParams.Validate();
             dynamics = new SecondOrderDynamics(ropeMiddle, dynamicsParams);
         }
 

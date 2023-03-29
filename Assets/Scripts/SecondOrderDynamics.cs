@@ -13,16 +13,8 @@ namespace DefaultNamespace
             public float f;
             public float z;
             public float r;
-
-            public void Validate()
-            {
-                if (f <= 0)
-                {
-                    f = 0.1f;
-                }
-            }
         }
-        
+
         public struct Consts
         {
             public float _w;
@@ -50,11 +42,11 @@ namespace DefaultNamespace
 
             float _w = 2 * Mathf.PI * f;
             float _z = z;
-            float  _d = _w * Mathf.Sqrt(Mathf.Abs(_z * _z - 1));
-            float  k1 = z / (Mathf.PI * f);
-            float  k2 = 1 / (_w * _w);
-            float  k3 = r * z / _w;
-            
+            float _d = _w * Mathf.Sqrt(Mathf.Abs(_z * _z - 1));
+            float k1 = z / (Mathf.PI * f);
+            float k2 = 1 / (_w * _w);
+            float k3 = r * z / _w;
+
             consts = new Consts
             {
                 _w = _w,
@@ -68,7 +60,8 @@ namespace DefaultNamespace
 
         public Vector3 Update(float deltaTime, Vector3 targetPosition)
         {
-            (currentPosition, currentVelocity) = Update(deltaTime, targetPosition, previousTargetPosition, currentPosition, currentVelocity, consts);
+            (currentPosition, currentVelocity) = Update(deltaTime, targetPosition, previousTargetPosition,
+                currentPosition, currentVelocity, consts);
             previousTargetPosition = targetPosition;
             return currentPosition;
         }
@@ -85,23 +78,28 @@ namespace DefaultNamespace
 
             if (consts._w * deltaTime < consts._z) //clamp k2 to avoid instability with jitters
             {
-                k2Stable = Mathf.Max(Mathf.Max(consts.k2, deltaTime * deltaTime / 2 + deltaTime * consts.k1 / 2), deltaTime * consts.k1);
+                k2Stable = Mathf.Max(Mathf.Max(consts.k2, deltaTime * deltaTime / 2 + deltaTime * consts.k1 / 2),
+                    deltaTime * consts.k1);
             }
             else
             {
                 float t1 = Mathf.Exp(-consts._z * consts._w * deltaTime);
-                float alpha = 2 * t1 * (consts._z <= 1 ? Mathf.Cos(deltaTime * consts._d) : (float)Math.Cosh(deltaTime * consts._d));
+                float alpha = 2 * t1 * (consts._z <= 1
+                    ? Mathf.Cos(deltaTime * consts._d)
+                    : (float)Math.Cosh(deltaTime * consts._d));
                 float beta = t1 * t1;
                 float t2 = deltaTime / (1 * beta - alpha);
                 k2Stable = deltaTime * t2;
             }
 
             currentPosition = currentPosition + deltaTime * currentVelocity; //integrate position by velocity
-            currentVelocity = currentVelocity + deltaTime * (targetPosition + consts.k3 * deltaPosition - currentPosition - consts.k1 * currentVelocity) / k2Stable; //integrate velocity by acceleration
+            currentVelocity = currentVelocity + deltaTime *
+                (targetPosition + consts.k3 * deltaPosition - currentPosition - consts.k1 * currentVelocity) /
+                k2Stable; //integrate velocity by acceleration
             return (currentPosition, currentVelocity);
         }
 
-        
+
         public void DrawInspector(Material material, Rect clipRect, Rect frameSize)
         {
             const int BORDER = 3;
@@ -116,22 +114,36 @@ namespace DefaultNamespace
 
             GLDraw.Line(BORDER, 100, frameSize.width - BORDER, 100, new Color(0.7f, 0.7f, 0.7f));
 
-            GLDraw.Lines(new Color(0.7f, 0.7f, 0), new Vector2(BORDER, 150), new Vector2(100, 150),
-                new Vector2(100, 50), new Vector2(frameSize.width, 50));
-            GLDraw.Lines(new Color(0.7f, 0.7f, 0), new Vector2(BORDER, 150 + 1), new Vector2(100 + 1, 150 + 1),
-                new Vector2(100 + 1, 50 + 1), new Vector2(frameSize.width, 50 + 1));
+            const int THRESHOLD = 100;
+
+            GLDraw.Lines(new Color(0.7f, 0.7f, 0), new Vector2(BORDER, 150), new Vector2(THRESHOLD, 150),
+                new Vector2(THRESHOLD, 50), new Vector2(frameSize.width, 50));
+            GLDraw.Lines(new Color(0.7f, 0.7f, 0), new Vector2(BORDER, 150 + 1), new Vector2(THRESHOLD + 1, 150 + 1),
+                new Vector2(THRESHOLD + 1, 50 + 1), new Vector2(frameSize.width, 50 + 1));
 
 
-            Vector3 targetPosition = new Vector3(100, 150, 0);
-            Vector3 previousTargetPosition = new Vector3(100, 150, 0);
-            Vector3 currentPosition = new Vector3(100, 150, 0);
-            Vector3 currentVelocity = new Vector3(0, 0, 0);
-            for (int i = 0; i < frameSize.width; i += 5)
+            Vector3 targetPosition = new(0, 1.5f, 0);
+            Vector3 previousTargetPosition = new(0, 1.5f, 0);
+            Vector3 currentPosition = new(0, 1.5f, 0);
+            Vector3 currentVelocity = new(0, 0, 0);
+
+            Vector2[] points = new Vector2[(int)frameSize.width];
+            for (int i = 0; i < (int)frameSize.width; i++)
             {
-                (currentPosition, currentVelocity) = Update(0.05f, targetPosition, previousTargetPosition, currentPosition, currentVelocity, consts);
-                GLDraw.Line(i, currentPosition.y, i + 5, currentPosition.y, Color.green);
+                if (i > THRESHOLD)
+                {
+                    targetPosition = new(0, 0.5f, 0);
+                }
+
+                (currentPosition, currentVelocity) = Update(2f, targetPosition, previousTargetPosition,
+                    currentPosition, currentVelocity, consts);
+                previousTargetPosition = targetPosition;
+                float currentPositionY = currentPosition.y;
+                //    currentPositionY /= 100;
+                points[i] = new Vector2(BORDER + i, currentPositionY * 100);
             }
 
+            GLDraw.Lines(Color.green, points);
 
             GL.PopMatrix();
             GUI.EndClip();
