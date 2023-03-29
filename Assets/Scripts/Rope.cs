@@ -9,8 +9,7 @@ namespace DefaultNamespace
         [SerializeField] private Transform ropeStart;
         [SerializeField] private Transform ropeEnd;
         [SerializeField] private float length;
-        
-        [SerializeField] private Transform ropeMiddledsa;
+        [SerializeField] private float sagging;
         
         [Space] [SerializeField] [Range(3, 50)]
         private int segmentsCount = 10;
@@ -35,7 +34,11 @@ namespace DefaultNamespace
 
         private void UpdateMiddlePosition()
         {
-            ropeMiddle = (ropeStart.position + ropeEnd.position) / 2 + Vector3.down * length;
+            var start = ropeStart.position;
+            var end = ropeEnd.position;
+            ropeMiddle = (start + end) / 2
+                         + Vector3.down * Mathf.Lerp(sagging, 0,
+                             Vector3.Distance(start, end) / length);
         }
 
         private void Update()

@@ -136,7 +136,7 @@ GameObject:
   - component: {fileID: 282964524}
   - component: {fileID: 282964523}
   m_Layer: 0
-  m_Name: Cube (1)
+  m_Name: SecondCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -150,7 +150,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 282964521}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.61, y: 3.39, z: 0.6}
+  m_LocalPosition: {x: 0.61, y: 3.88, z: 0.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -249,7 +249,7 @@ Light:
   m_Type: 1
   m_Shape: 0
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  m_Intensity: 1
+  m_Intensity: 1.34
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.802082
@@ -326,7 +326,7 @@ GameObject:
   - component: {fileID: 890453059}
   - component: {fileID: 890453058}
   m_Layer: 0
-  m_Name: Line
+  m_Name: Rope
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -346,7 +346,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ropeStart: {fileID: 1797841991}
   ropeEnd: {fileID: 282964522}
-  length: 6
+  length: 9.06
+  sagging: 9.69
   ropeMiddledsa: {fileID: 0}
   segmentsCount: 14
 --- !u!120 &890453059
@@ -392,20 +393,20 @@ LineRenderer:
   m_SortingOrder: 0
   m_Positions:
   - {x: 3.85, y: 2.34, z: 0}
-  - {x: 3.6899996, y: 1.6190814, z: 0.042857144}
-  - {x: 3.53, y: 1.0206122, z: 0.085714296}
-  - {x: 3.37, y: 0.54459167, z: 0.12857144}
-  - {x: 3.2099998, y: 0.19102025, z: 0.17142859}
-  - {x: 3.05, y: -0.040102184, z: 0.21428573}
-  - {x: 2.8899999, y: -0.14877546, z: 0.25714284}
-  - {x: 2.7299998, y: -0.13499999, z: 0.3}
-  - {x: 2.57, y: 0.0012245178, z: 0.34285718}
-  - {x: 2.41, y: 0.25989783, z: 0.3857143}
-  - {x: 2.25, y: 0.6410204, z: 0.42857143}
-  - {x: 2.09, y: 1.1445918, z: 0.47142857}
-  - {x: 1.9300001, y: 1.7706124, z: 0.51428574}
-  - {x: 1.7700001, y: 2.5190814, z: 0.55714285}
-  - {x: 1.61, y: 3.39, z: 0.6}
+  - {x: 3.6185713, y: 1.6806271, z: 0.042857144}
+  - {x: 3.387143, y: 1.1396198, z: 0.085714296}
+  - {x: 3.155714, y: 0.7169772, z: 0.12857144}
+  - {x: 2.9242857, y: 0.41269964, z: 0.17142859}
+  - {x: 2.6928573, y: 0.22678703, z: 0.21428573}
+  - {x: 2.4614284, y: 0.15923977, z: 0.25714284}
+  - {x: 2.2299998, y: 0.2100572, z: 0.3}
+  - {x: 1.9985713, y: 0.3792398, z: 0.34285718}
+  - {x: 1.767143, y: 0.6667871, z: 0.3857143}
+  - {x: 1.5357141, y: 1.0726998, z: 0.42857143}
+  - {x: 1.3042858, y: 1.596977, z: 0.47142857}
+  - {x: 1.0728571, y: 2.2396202, z: 0.51428574}
+  - {x: 0.84142864, y: 3.000627, z: 0.55714285}
+  - {x: 0.61, y: 3.88, z: 0.6}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.1
@@ -426,9 +427,9 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 1, g: 1, b: 1, a: 1}
-      key1: {r: 1, g: 1, b: 1, a: 1}
-      key2: {r: 0, g: 0, b: 0, a: 0}
+      key0: {r: 0.0754717, g: 0.0754717, b: 0.0754717, a: 1}
+      key1: {r: 0.0754717, g: 0.0754717, b: 0.0754717, a: 1}
+      key2: {r: 0.11320752, g: 0.092381604, b: 0.092381604, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
       key5: {r: 0, g: 0, b: 0, a: 0}
@@ -436,13 +437,13 @@ LineRenderer:
       key7: {r: 0, g: 0, b: 0, a: 0}
       ctime0: 0
       ctime1: 65535
-      ctime2: 0
+      ctime2: 65535
       ctime3: 0
       ctime4: 0
       ctime5: 0
       ctime6: 0
       ctime7: 0
-      atime0: 0
+      atime0: 578
       atime1: 65535
       atime2: 0
       atime3: 0
@@ -450,7 +451,7 @@ LineRenderer:
       atime5: 0
       atime6: 0
       atime7: 0
-      m_Mode: 0
+      m_Mode: 1
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
     numCornerVertices: 0
@@ -459,7 +460,7 @@ LineRenderer:
     textureMode: 0
     shadowBias: 0.5
     generateLightingData: 0
-  m_UseWorldSpace: 0
+  m_UseWorldSpace: 1
   m_Loop: 0
 --- !u!4 &890453060
 Transform:
@@ -469,7 +470,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 890453057}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 1.28, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -573,7 +574,7 @@ GameObject:
   - component: {fileID: 1797841993}
   - component: {fileID: 1797841992}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: FisrtCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
