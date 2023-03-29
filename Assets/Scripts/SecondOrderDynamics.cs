@@ -14,61 +14,86 @@ namespace DefaultNamespace
             public float z;
             public float r;
         }
+        
+        public struct Consts
+        {
+            public float _w;
+            public float _z;
+            public float _d;
+            public float k1;
+            public float k2;
+            public float k3;
+        }
 
-        private Vector3 xp; //previous position
-        private Vector3 y; //current position
-        private Vector3 yd; //current velocity
-
-        private float _w, _z, _d, k1, k2, k3;
+        private Vector3 previousTargetPosition;
+        private Vector3 currentPosition;
+        private Vector3 currentVelocity;
+        private Consts consts;
 
         public SecondOrderDynamics(Vector3 initialPosition, Params @params)
         {
-            y = initialPosition;
-            xp = initialPosition;
-            yd = Vector3.zero;
+            currentPosition = initialPosition;
+            previousTargetPosition = initialPosition;
+            currentVelocity = Vector3.zero;
 
             float f = @params.f;
             float z = @params.z;
             float r = @params.r;
 
-            _w = 2 * Mathf.PI * f;
-            _z = z;
-            _d = _w * Mathf.Sqrt(Mathf.Abs(_z * _z - 1));
-            k1 = z / (Mathf.PI * f);
-            k2 = 1 / (_w * _w);
-            k3 = r * z / _w;
+            float _w = 2 * Mathf.PI * f;
+            float _z = z;
+            float  _d = _w * Mathf.Sqrt(Mathf.Abs(_z * _z - 1));
+            float  k1 = z / (Mathf.PI * f);
+            float  k2 = 1 / (_w * _w);
+            float  k3 = r * z / _w;
+            
+            consts = new Consts
+            {
+                _w = _w,
+                _z = _z,
+                _d = _d,
+                k1 = k1,
+                k2 = k2,
+                k3 = k3
+            };
         }
 
-        public Vector3 Update(float T, Vector3 x, Vector3? xd = null)
+        public Vector3 Update(float deltaTime, Vector3 targetPosition)
         {
-            if (xd == null)
-            {
-                xd = x - xp; //estimate velocity
-                xp = x;
-            }
+            (currentPosition, currentVelocity) = Update(deltaTime, targetPosition, previousTargetPosition, currentPosition, currentVelocity, consts);
+            previousTargetPosition = targetPosition;
+            return currentPosition;
+        }
+        
+        
+        public static (Vector3 currentPosition, Vector3 currentVelocity) Update(
+            float deltaTime,
+            Vector3 targetPosition, Vector3 previousTargetPosition,
+            Vector3 currentPosition, Vector3 currentVelocity,
+            Consts consts)
+        {
+            Vector3 deltaPosition = targetPosition - previousTargetPosition; //estimate velocity
+            float k2Stable;
 
-            float k1Stable, k2Stable;
-
-            if (_w * T < _z) //clamp k2 to avoid instability with jitters
+            if (consts._w * deltaTime < consts._z) //clamp k2 to avoid instability with jitters
             {
-                k1Stable = k1;
-                k2Stable = Mathf.Max(Mathf.Max(k2, T * T / 2 + T * k1 / 2), T * k1);
+                k2Stable = Mathf.Max(Mathf.Max(consts.k2, deltaTime * deltaTime / 2 + deltaTime * consts.k1 / 2), deltaTime * consts.k1);
             }
             else
             {
-                float t1 = Mathf.Exp(-_z * _w * T);
-                float alpha = 2 * t1 * (_z <= 1 ? Mathf.Cos(T * _d) : (float)Math.Cosh(T * _d));
+                float t1 = Mathf.Exp(-consts._z * consts._w * deltaTime);
+                float alpha = 2 * t1 * (consts._z <= 1 ? Mathf.Cos(deltaTime * consts._d) : (float)Math.Cosh(deltaTime * consts._d));
                 float beta = t1 * t1;
-                float t2 = T / (1 * beta - alpha);
-                k1Stable = (1 - beta) * t2;
-                k2Stable = T * t2;
+                float t2 = deltaTime / (1 * beta - alpha);
+                k2Stable = deltaTime * t2;
             }
 
-            y = y + T * yd; //integrate position by velocity
-            yd = yd + T * (x + k3 * xd.Value - y - k1 * yd) / k2Stable; //integrate velocity by acceleration
-            return y;
+            currentPosition = currentPosition + deltaTime * currentVelocity; //integrate position by velocity
+            currentVelocity = currentVelocity + deltaTime * (targetPosition + consts.k3 * deltaPosition - currentPosition - consts.k1 * currentVelocity) / k2Stable; //integrate velocity by acceleration
+            return (currentPosition, currentVelocity);
         }
 
+        
         public void DrawInspector(Material material, Rect clipRect, Rect frameSize)
         {
             const int BORDER = 3;
@@ -87,6 +112,13 @@ namespace DefaultNamespace
                 new Vector2(100, 50), new Vector2(frameSize.width, 50));
             GLDraw.Lines(new Color(0.7f, 0.7f, 0), new Vector2(BORDER, 150 + 1), new Vector2(100 + 1, 150 + 1),
                 new Vector2(100 + 1, 50 + 1), new Vector2(frameSize.width, 50 + 1));
+
+            for (int i = 0; i < frameSize.width; i += 5)
+            {
+                
+                
+            }
+
 
             GL.PopMatrix();
             GUI.EndClip();
