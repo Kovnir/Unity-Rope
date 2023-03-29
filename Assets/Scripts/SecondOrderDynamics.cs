@@ -13,6 +13,14 @@ namespace DefaultNamespace
             public float f;
             public float z;
             public float r;
+
+            public void Validate()
+            {
+                if (f <= 0)
+                {
+                    f = 0.1f;
+                }
+            }
         }
         
         public struct Consts
@@ -64,9 +72,9 @@ namespace DefaultNamespace
             previousTargetPosition = targetPosition;
             return currentPosition;
         }
-        
-        
-        public static (Vector3 currentPosition, Vector3 currentVelocity) Update(
+
+
+        private static (Vector3 currentPosition, Vector3 currentVelocity) Update(
             float deltaTime,
             Vector3 targetPosition, Vector3 previousTargetPosition,
             Vector3 currentPosition, Vector3 currentVelocity,
@@ -113,10 +121,15 @@ namespace DefaultNamespace
             GLDraw.Lines(new Color(0.7f, 0.7f, 0), new Vector2(BORDER, 150 + 1), new Vector2(100 + 1, 150 + 1),
                 new Vector2(100 + 1, 50 + 1), new Vector2(frameSize.width, 50 + 1));
 
+
+            Vector3 targetPosition = new Vector3(100, 150, 0);
+            Vector3 previousTargetPosition = new Vector3(100, 150, 0);
+            Vector3 currentPosition = new Vector3(100, 150, 0);
+            Vector3 currentVelocity = new Vector3(0, 0, 0);
             for (int i = 0; i < frameSize.width; i += 5)
             {
-                
-                
+                (currentPosition, currentVelocity) = Update(0.05f, targetPosition, previousTargetPosition, currentPosition, currentVelocity, consts);
+                GLDraw.Line(i, currentPosition.y, i + 5, currentPosition.y, Color.green);
             }
 
 
