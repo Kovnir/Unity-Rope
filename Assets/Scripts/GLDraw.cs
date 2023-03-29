@@ -1,0 +1,61 @@
+using UnityEngine;
+
+namespace GLHelper
+{
+    public static class GLDraw
+    {
+        public static void Rect(float x, float y, float width, float height, Color color)
+        {
+            GL.Begin(GL.QUADS);
+            GL.Color(color);
+            GL.Vertex3(x, y, 0);
+            GL.Vertex3(width, y, 0);
+            GL.Vertex3(width, height, 0);
+            GL.Vertex3(x, height, 0);
+            GL.End();
+        }
+
+        public static void EmptyRect(float x, float y, float width, float height, Color color)
+        {
+            GL.Begin(GL.LINES);
+            GL.Color(color);
+            GL.Vertex3(x, y, 0);
+            GL.Vertex3(width, y, 0);
+            GL.Vertex3(width, y, 0);
+            GL.Vertex3(width, height, 0);
+            GL.Vertex3(width, height, 0);
+            GL.Vertex3(x, height, 0);
+            GL.Vertex3(x, height, 0);
+            GL.Vertex3(x, y, 0);
+            GL.End();
+        }
+        public static void EmptyRect(float x, float y, float width, float height, int thickness, Color color)
+        {
+            for (int i = 0; i < thickness; i++)
+            {
+                EmptyRect(x + i, y + i, width - i, height - i, color);
+            }
+        }
+
+        public static void Line(float x1, float y1, float x2, float y2, Color color)
+        {
+            GL.Begin(GL.LINES);
+            GL.Color(color);
+            GL.Vertex3(x1, y1, 0);
+            GL.Vertex3(x2, y2, 0);
+            GL.End();
+        }
+        
+        public static void Lines(Color color, params Vector2[] points)
+        {
+            GL.Begin(GL.LINES);
+            GL.Color(color);
+            for (int i = 0; i < points.Length -1; i++)
+            {
+                GL.Vertex3(points[i].x, points[i].y, 0);
+                GL.Vertex3(points[i+1].x, points[i+1].y, 0);
+            }
+            GL.End();
+        }
+    }
+}

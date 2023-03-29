@@ -8,11 +8,12 @@ namespace DefaultNamespace
     {
         [SerializeField] private Transform ropeStart;
         [SerializeField] private Transform ropeEnd;
-        [SerializeField] private float length;
-        [SerializeField] private SecondOrderDynamics.Params dynamicsParams;
         
-        [Space] [SerializeField] [Range(3, 50)]
-        private int segmentsCount = 10;
+        [Space] [SerializeField] private float length;
+        [SerializeField] [Range(3, 50)] private int segmentsCount = 10;
+        
+        [Space] [SerializeField] private SecondOrderDynamics.Params dynamicsParams;
+
 
         private LineRenderer lineRenderer;
         private Vector3 ropeMiddle;
@@ -20,7 +21,7 @@ namespace DefaultNamespace
         private Vector3 ropeTarget;
 
         SecondOrderDynamics dynamics;
-        
+
         private void Awake()
         {
             TryGetLineRenderer();
@@ -28,7 +29,7 @@ namespace DefaultNamespace
             InitDynamics();
             UpdateTarget();
         }
-        
+
         [ContextMenu("Init Dynamics")]
         void InitDynamics()
         {
@@ -51,7 +52,7 @@ namespace DefaultNamespace
                          + Vector3.down * Mathf.Lerp(length, 0,
                              Vector3.Distance(start, end) / length);
         }
-        
+
         private void UpdateTarget()
         {
             if (Application.isPlaying)
@@ -105,9 +106,15 @@ namespace DefaultNamespace
 
             Gizmos.color = Color.blue;
             Gizmos.DrawSphere(ropeMiddle, 0.1f);
-            
+
             Gizmos.color = Color.green;
             Gizmos.DrawSphere(ropeTarget, 0.1f);
+        }
+
+
+        public void DrawInspector(Material material, Rect clipRect, Rect frameSize)
+        {
+            dynamics.DrawInspector(material, clipRect, frameSize);
         }
     }
 }
