@@ -1,7 +1,6 @@
 using System;
 using GLHelper;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace DefaultNamespace
 {
@@ -75,28 +74,33 @@ namespace DefaultNamespace
             Consts consts)
         {
             Vector3 targetVelocity = (targetPosition - previousTargetPosition) / deltaTime; //estimate velocity
-            // float k2Stable;
-            //
-            // if (consts._w * deltaTime < consts._z) //clamp k2 to avoid instability with jitters
-            // {
-            //     k2Stable = Mathf.Max(Mathf.Max(consts.k2, deltaTime * deltaTime / 2 + deltaTime * consts.k1 / 2),
-            //         deltaTime * consts.k1);
-            // }
-            // else
-            // {
-            //     float t1 = Mathf.Exp(-consts._z * consts._w * deltaTime);
-            //     float alpha = 2 * t1 * (consts._z <= 1
-            //         ? Mathf.Cos(deltaTime * consts._d)
-            //         : (float)Math.Cosh(deltaTime * consts._d));
-            //     float beta = t1 * t1;
-            //     float t2 = deltaTime / (1 * beta - alpha);
-            //     k2Stable = deltaTime * t2;
-            // }
+
+            float k1Stable;
+            float k2Stable;
+
+            if (consts._w * deltaTime < consts._z) //clamp k2 to avoid instability with jitters
+            {
+                k1Stable = consts.k1;
+                k2Stable = Mathf.Max(Mathf.Max(consts.k2, deltaTime * deltaTime / 2 + deltaTime * consts.k1 / 2),
+                    deltaTime * consts.k1);
+            }
+            else
+            {
+                float t1 = Mathf.Exp(-consts._z * consts._w * deltaTime);
+                float alpha = 2 * t1 * (consts._z <= 1
+                    ? Mathf.Cos(deltaTime * consts._d)
+                    : (float)Math.Cosh(deltaTime * consts._d));
+                float beta = t1 * t1;
+                float t2 = deltaTime / (1 * beta - alpha);
+                k1Stable = (1 - beta) * t2;
+                k2Stable = deltaTime * t2;
+            }
 
             currentPosition += deltaTime * currentVelocity; //integrate position by velocity
             currentVelocity += deltaTime *
-                               (targetPosition + consts.k3 * targetVelocity - currentPosition - consts.k1 * currentVelocity) /
-                               consts.k2; //integrate velocity by acceleration
+                               (targetPosition + consts.k3 * targetVelocity - currentPosition -
+                                k1Stable * currentVelocity) /
+                               k2Stable; //integrate velocity by acceleration
             return (currentPosition, currentVelocity);
         }
 
@@ -114,6 +118,10 @@ namespace DefaultNamespace
             GLDraw.EmptyRect(0, 0, frameSize.width, frameSize.yMax, BORDER, Color.gray);
 
             frameSize.width -= BORDER;
+            frameSize.y += BORDER;
+            frameSize.height -= BORDER * 2;
+            frameSize.x += BORDER;
+
             GLDraw.Line(BORDER, 100, frameSize.width, 100, new Color(0.7f, 0.7f, 0.7f));
 
             const int THRESHOLD = 100;
@@ -125,9 +133,9 @@ namespace DefaultNamespace
 
 
             Vector3 targetPosition = new(0, 1.5f, 0);
-            Vector3 previousTargetPosition = new(0, 1.5f, 0);
-            Vector3 currentPosition = new(0, 1.5f, 0);
-            Vector3 currentVelocity = new(0, 0, 0);
+            Vector3 prevTargetPosition = new(0, 1.5f, 0);
+            Vector3 currPosition = new(0, 1.5f, 0);
+            Vector3 currVelocity = new(0, 0, 0);
 
             Vector2[] points = new Vector2[(int)frameSize.width];
             for (int i = 0; i < (int)frameSize.width; i++)
@@ -137,10 +145,10 @@ namespace DefaultNamespace
                     targetPosition = new(0, 0.5f, 0);
                 }
 
-                (currentPosition, currentVelocity) = Update(0.01f, targetPosition, previousTargetPosition,
-                    currentPosition, currentVelocity, consts);
-                previousTargetPosition = targetPosition;
-                float currentPositionY = currentPosition.y;
+                (currPosition, currVelocity) = Update(0.01f, targetPosition, prevTargetPosition,
+                    currPosition, currVelocity, consts);
+                prevTargetPosition = targetPosition;
+                float currentPositionY = currPosition.y;
                 points[i] = new Vector2(BORDER + i, currentPositionY * 100);
             }
 

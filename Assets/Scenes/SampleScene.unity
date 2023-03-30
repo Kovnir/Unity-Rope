@@ -349,9 +349,9 @@ MonoBehaviour:
   length: 8.8
   segmentsCount: 21
   dynamicsParams:
-    f: 2
-    z: 0.3
-    r: 4
+    Frequency: 2
+    Damping: 0.25
+    Response: 0
 --- !u!120 &890453059
 LineRenderer:
   m_ObjectHideFlags: 0
