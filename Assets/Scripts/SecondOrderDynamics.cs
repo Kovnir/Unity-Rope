@@ -74,29 +74,29 @@ namespace DefaultNamespace
             Vector3 currentPosition, Vector3 currentVelocity,
             Consts consts)
         {
-            Vector3 deltaPosition = (targetPosition - previousTargetPosition) / deltaTime; //estimate velocity
-            float k2Stable;
+            Vector3 targetVelocity = (targetPosition - previousTargetPosition) / deltaTime; //estimate velocity
+            // float k2Stable;
+            //
+            // if (consts._w * deltaTime < consts._z) //clamp k2 to avoid instability with jitters
+            // {
+            //     k2Stable = Mathf.Max(Mathf.Max(consts.k2, deltaTime * deltaTime / 2 + deltaTime * consts.k1 / 2),
+            //         deltaTime * consts.k1);
+            // }
+            // else
+            // {
+            //     float t1 = Mathf.Exp(-consts._z * consts._w * deltaTime);
+            //     float alpha = 2 * t1 * (consts._z <= 1
+            //         ? Mathf.Cos(deltaTime * consts._d)
+            //         : (float)Math.Cosh(deltaTime * consts._d));
+            //     float beta = t1 * t1;
+            //     float t2 = deltaTime / (1 * beta - alpha);
+            //     k2Stable = deltaTime * t2;
+            // }
 
-            if (consts._w * deltaTime < consts._z) //clamp k2 to avoid instability with jitters
-            {
-                k2Stable = Mathf.Max(Mathf.Max(consts.k2, deltaTime * deltaTime / 2 + deltaTime * consts.k1 / 2),
-                    deltaTime * consts.k1);
-            }
-            else
-            {
-                float t1 = Mathf.Exp(-consts._z * consts._w * deltaTime);
-                float alpha = 2 * t1 * (consts._z <= 1
-                    ? Mathf.Cos(deltaTime * consts._d)
-                    : (float)Math.Cosh(deltaTime * consts._d));
-                float beta = t1 * t1;
-                float t2 = deltaTime / (1 * beta - alpha);
-                k2Stable = deltaTime * t2;
-            }
-
-            currentPosition = currentPosition + deltaTime * currentVelocity; //integrate position by velocity
-            currentVelocity = currentVelocity + deltaTime *
-                (targetPosition + consts.k3 * deltaPosition - currentPosition - consts.k1 * currentVelocity) /
-                k2Stable; //integrate velocity by acceleration
+            currentPosition += deltaTime * currentVelocity; //integrate position by velocity
+            currentVelocity += deltaTime *
+                               (targetPosition + consts.k3 * targetVelocity - currentPosition - consts.k1 * currentVelocity) /
+                               consts.k2; //integrate velocity by acceleration
             return (currentPosition, currentVelocity);
         }
 
@@ -113,7 +113,8 @@ namespace DefaultNamespace
             GLDraw.Rect(0, 0, frameSize.width, frameSize.yMax, Color.black);
             GLDraw.EmptyRect(0, 0, frameSize.width, frameSize.yMax, BORDER, Color.gray);
 
-            GLDraw.Line(BORDER, 100, frameSize.width - BORDER, 100, new Color(0.7f, 0.7f, 0.7f));
+            frameSize.width -= BORDER;
+            GLDraw.Line(BORDER, 100, frameSize.width, 100, new Color(0.7f, 0.7f, 0.7f));
 
             const int THRESHOLD = 100;
 
@@ -136,15 +137,14 @@ namespace DefaultNamespace
                     targetPosition = new(0, 0.5f, 0);
                 }
 
-                (currentPosition, currentVelocity) = Update(2f, targetPosition, previousTargetPosition,
+                (currentPosition, currentVelocity) = Update(0.01f, targetPosition, previousTargetPosition,
                     currentPosition, currentVelocity, consts);
                 previousTargetPosition = targetPosition;
                 float currentPositionY = currentPosition.y;
-                //    currentPositionY /= 100;
                 points[i] = new Vector2(BORDER + i, currentPositionY * 100);
             }
 
-            GLDraw.Lines(Color.green, points);
+            GLDraw.Lines(Color.green, frameSize, points);
 
             GL.PopMatrix();
             GUI.EndClip();
