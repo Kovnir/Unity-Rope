@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace BezierCurves
+namespace Kovnir.Rope.Math
 {
     public static class BezierCurve
     {

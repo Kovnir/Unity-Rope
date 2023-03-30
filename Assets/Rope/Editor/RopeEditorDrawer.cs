@@ -1,9 +1,7 @@
 using System.Reflection;
-using DefaultNamespace;
 using UnityEditor;
-using UnityEngine;
 
-namespace GLHelper
+namespace Kovnir.Rope.Editor
 {
     [CustomEditor(typeof(Rope))]
     public sealed class RopeEditorDrawer : UnityEditor.Editor
@@ -14,57 +12,41 @@ namespace GLHelper
         SerializedProperty segmentsCount;
         SerializedProperty dynamicsParams;
 
-
-        Material material;
+        private MethodInfo initRopeDynamics;
 
         private void OnEnable()
         {
-            var shader = Shader.Find("Hidden/Internal-Colored");
-            material = new Material(shader);
-
             ropeStart = serializedObject.FindProperty("ropeStart");
             ropeEnd = serializedObject.FindProperty("ropeEnd");
             length = serializedObject.FindProperty("length");
             segmentsCount = serializedObject.FindProperty("segmentsCount");
             dynamicsParams = serializedObject.FindProperty("dynamicsParams");
-        }
-
-        private void OnDisable()
-        {
-            DestroyImmediate(material);
+            
+            Rope rope = (Rope)target;
+            initRopeDynamics = rope.GetType().GetMethod("InitDynamics", BindingFlags.Instance | BindingFlags.NonPublic);
         }
 
         public override void OnInspectorGUI()
         {
+            serializedObject.Update();
+            
             DrawMainFields();
-
             EditorGUILayout.Space();
-            Rect frameSize = GetCurrentRect();
-            frameSize.yMin = 0;
-            frameSize.yMax = 200;
-
-            Rect clipRect = GUILayoutUtility.GetRect(frameSize.xMin, frameSize.xMax, frameSize.yMin, frameSize.yMax);
-            if (Event.current.type == EventType.Repaint)
+            
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(dynamicsParams);
+            if (EditorGUI.EndChangeCheck())
             {
-                Rope rope = target as Rope;
-                rope.DrawInspector(material, clipRect, frameSize);
+                dynamicsParams.serializedObject.ApplyModifiedProperties();
+                initRopeDynamics
+                    .Invoke(target, null);
             }
-        }
-
-        private static Rect GetCurrentRect()
-        {
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            EditorGUILayout.EndHorizontal();
-            Rect frameSize = GUILayoutUtility.GetLastRect();
-            return frameSize;
+            
+            serializedObject.ApplyModifiedProperties();
         }
 
         private void DrawMainFields()
         {
-            serializedObject.Update();
-
-            //custom editor for main fields of Rope
             EditorGUILayout.PropertyField(ropeStart);
             EditorGUILayout.PropertyField(ropeEnd);
             EditorGUILayout.Space();
@@ -76,21 +58,6 @@ namespace GLHelper
             }
 
             EditorGUILayout.IntSlider(segmentsCount, 3, 50);
-
-            EditorGUILayout.Space();
-
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(dynamicsParams);
-            if (EditorGUI.EndChangeCheck())
-            {
-                dynamicsParams.serializedObject.ApplyModifiedProperties();
-                Rope rope = (Rope)target;
-                rope.GetType().GetMethod("InitDynamics", BindingFlags.Instance | BindingFlags.NonPublic)
-                    .Invoke(rope, null);
-            }
-
-
-            serializedObject.ApplyModifiedProperties();
         }
     }
 }

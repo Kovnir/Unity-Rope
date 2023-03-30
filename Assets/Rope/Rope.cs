@@ -1,7 +1,7 @@
-using BezierCurves;
+using Kovnir.Rope.Math;
 using UnityEngine;
 
-namespace DefaultNamespace
+namespace Kovnir.Rope
 {
     [RequireComponent(typeof(LineRenderer))]
     public sealed class Rope : MonoBehaviour
@@ -12,7 +12,7 @@ namespace DefaultNamespace
         [SerializeField] private float length;
         [SerializeField] private int segmentsCount = 10;
         
-        [SerializeField] private SecondOrderDynamics.Params dynamicsParams;
+        [SerializeField] private SecondOrderCalculator.Params dynamicsParams;
 
 
         private LineRenderer lineRenderer;
@@ -20,7 +20,7 @@ namespace DefaultNamespace
         private Vector3? ropeMiddlePrevious;
         private Vector3 ropeTarget;
 
-        SecondOrderDynamics dynamics;
+        SecondOrderCalculator calculator;
 
         private void Awake()
         {
@@ -33,7 +33,7 @@ namespace DefaultNamespace
         [ContextMenu("Init Dynamics")]
         void InitDynamics()
         {
-            dynamics = new SecondOrderDynamics(ropeMiddle, dynamicsParams);
+            calculator = new SecondOrderCalculator(ropeMiddle, dynamicsParams);
         }
 
         private void TryGetLineRenderer()
@@ -57,7 +57,7 @@ namespace DefaultNamespace
         {
             if (Application.isPlaying)
             {
-                ropeTarget = dynamics.Update(Time.deltaTime, ropeMiddle);
+                ropeTarget = calculator.Update(Time.deltaTime, ropeMiddle);
             }
             else
             {
@@ -94,7 +94,7 @@ namespace DefaultNamespace
             {
                 UpdateMiddlePosition();
 
-                if (dynamics == null)
+                if (calculator == null)
                 {
                     InitDynamics();
                 }
@@ -109,11 +109,6 @@ namespace DefaultNamespace
 
             Gizmos.color = Color.green;
             Gizmos.DrawSphere(ropeTarget, 0.1f);
-        }
-
-        public void DrawInspector(Material material, Rect clipRect, Rect frameSize)
-        {
-            dynamics?.DrawInspector(material, clipRect, frameSize);
         }
     }
 }

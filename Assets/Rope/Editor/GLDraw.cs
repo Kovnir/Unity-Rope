@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GLHelper
+namespace Kovnir.Rope.Editor
 {
     public static class GLDraw
     {
