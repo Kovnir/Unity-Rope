@@ -113,7 +113,7 @@ namespace DefaultNamespace
 
         public void DrawInspector(Material material, Rect clipRect, Rect frameSize)
         {
-            dynamics.DrawInspector(material, clipRect, frameSize);
+            dynamics?.DrawInspector(material, clipRect, frameSize);
         }
     }
 }

@@ -14,22 +14,22 @@ namespace Editor
             var indent = EditorGUI.indentLevel;
             EditorGUI.indentLevel = 1;
 
-            var f = property.FindPropertyRelative("f");
-            var z = property.FindPropertyRelative("z");
-            var r = property.FindPropertyRelative("r");
+            var frequency = property.FindPropertyRelative("Frequency");
+            var damping = property.FindPropertyRelative("Damping");
+            var response = property.FindPropertyRelative("Response");
 
-            EditorGUILayout.PropertyField(f);
-            EditorGUILayout.PropertyField(z);
-            EditorGUILayout.PropertyField(r);
+            EditorGUILayout.PropertyField(frequency);
+            EditorGUILayout.PropertyField(damping);
+            EditorGUILayout.PropertyField(response);
             
-            if (f.floatValue <= 0.1f)
+            if (frequency.floatValue <= 0.1f)
             {
-                f.floatValue = 0.1f;
+                frequency.floatValue = 0.1f;
             }
             
-            if (z.floatValue <= 0.1f)
+            if (damping.floatValue <= 0.1f)
             {
-                z.floatValue = 0.1f;
+                damping.floatValue = 0.1f;
             }
             
             EditorGUI.indentLevel = indent;

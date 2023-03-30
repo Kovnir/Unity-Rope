@@ -1,6 +1,7 @@
 using System;
 using GLHelper;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace DefaultNamespace
 {
@@ -10,9 +11,9 @@ namespace DefaultNamespace
         [Serializable]
         public struct Params
         {
-            public float f;
-            public float z;
-            public float r;
+            public float Frequency;
+            public float Damping;
+            public float Response;
         }
 
         public struct Consts
@@ -36,9 +37,9 @@ namespace DefaultNamespace
             previousTargetPosition = initialPosition;
             currentVelocity = Vector3.zero;
 
-            float f = @params.f;
-            float z = @params.z;
-            float r = @params.r;
+            float f = @params.Frequency;
+            float z = @params.Damping;
+            float r = @params.Response;
 
             float _w = 2 * Mathf.PI * f;
             float _z = z;
@@ -73,7 +74,7 @@ namespace DefaultNamespace
             Vector3 currentPosition, Vector3 currentVelocity,
             Consts consts)
         {
-            Vector3 deltaPosition = targetPosition - previousTargetPosition; //estimate velocity
+            Vector3 deltaPosition = (targetPosition - previousTargetPosition) / deltaTime; //estimate velocity
             float k2Stable;
 
             if (consts._w * deltaTime < consts._z) //clamp k2 to avoid instability with jitters
