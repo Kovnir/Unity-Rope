@@ -95,27 +95,12 @@ namespace Kovnir.Rope.Editor
                     points[i] = p1;
                     points[i + 1] = p2;
                 }
-
-
-
+                
                 GL.Vertex3(points[i].x, points[i].y, 0);
                 GL.Vertex3(points[i + 1].x, points[i + 1].y, 0);
             }
 
             GL.End();
-        }
-        private static void AdjustPointToBounds(Vector2 point, Vector2 otherPoint, float bound, Rect bounds, bool adjustX = true)
-        {
-            if (adjustX)
-            {
-                point.y += (otherPoint.y - point.y) * (bound - point.x) / (otherPoint.x - point.x);
-                point.x = bound;
-            }
-            else
-            {
-                point.x += (otherPoint.x - point.x) * (bound - point.y) / (otherPoint.y - point.y);
-                point.y = bound;
-            }
         }
     }
 }

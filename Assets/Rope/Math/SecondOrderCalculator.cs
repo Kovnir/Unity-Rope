@@ -102,7 +102,7 @@ namespace Kovnir.Rope.Math
                     ? Mathf.Cos(deltaTime * consts._d)
                     : (float)System.Math.Cosh(deltaTime * consts._d));
                 float beta = t1 * t1;
-                float t2 = deltaTime / (1 * beta - alpha);
+                float t2 = deltaTime / (1 + beta - alpha);
                 k1Stable = (1 - beta) * t2;
                 k2Stable = deltaTime * t2;
             }
