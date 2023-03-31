@@ -30,7 +30,6 @@ namespace Kovnir.Rope
             UpdateTarget();
         }
 
-        [ContextMenu("Init Dynamics")]
         void InitDynamics()
         {
             calculator = new SecondOrderCalculator(ropeMiddle, dynamicsParams);
