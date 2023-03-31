@@ -47,6 +47,11 @@ namespace Kovnir.Rope.Editor
 
         private void DrawMainFields()
         {
+            if (ropeStart.objectReferenceValue == null || ropeEnd.objectReferenceValue == null)
+            {
+                EditorGUILayout.HelpBox("You need to setup Rope Start and Rope End transforms.", MessageType.Error);
+            }
+            
             EditorGUILayout.PropertyField(ropeStart);
             EditorGUILayout.PropertyField(ropeEnd);
             EditorGUILayout.Space();
