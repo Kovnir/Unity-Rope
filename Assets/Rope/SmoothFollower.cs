@@ -9,8 +9,8 @@ namespace Rope
         [SerializeField] private Transform target;
         [SerializeField] private SecondOrderCalculatorParams dynamicsParams;
 
-        Vector3SecondOrderCalculator calculator;
-        Vector3SecondOrderCalculator calculator1;
+        Vector3SecondOrderCalculator positionCalculator;
+        QuaternionSecondOrderCalculator rotationCalculator;
 
         void Awake()
         {
@@ -19,15 +19,14 @@ namespace Rope
 
         void InitDynamics()
         {
-            calculator = new Vector3SecondOrderCalculator(target.position, dynamicsParams);
-            calculator1 = new Vector3SecondOrderCalculator(target.rotation.eulerAngles, dynamicsParams);
+            positionCalculator = new Vector3SecondOrderCalculator(target.position, dynamicsParams);
+            rotationCalculator = new QuaternionSecondOrderCalculator(target.rotation, dynamicsParams);
         }
 
         void Update()
         {
-            transform.position = calculator.Update(Time.deltaTime, target.position);
-            transform.rotation =
-                UnityEngine.Quaternion.Euler(calculator1.Update(Time.deltaTime, target.rotation.eulerAngles));
+            transform.position = positionCalculator.Update(Time.deltaTime, target.position);
+            transform.rotation = rotationCalculator.Update(Time.deltaTime, target.rotation);
         }
     }
 }

@@ -35,16 +35,6 @@ namespace Kovnir.Rope.Math
                 return new Vector3Data(value / other);
             }
 
-            IData<Vector3> IData<Vector3>.Add(Vector3 other)
-            {
-                return new Vector3Data(value + other);
-            }
-
-            IData<Vector3> IData<Vector3>.Sub(Vector3 other)
-            {
-                return new Vector3Data(value - other);
-            }
-
             public Vector3 GetData() => value;
         }
 

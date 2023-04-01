@@ -12,9 +12,6 @@ namespace Kovnir.Rope.Math
             public static IData<T> operator *(IData<T> a, float b) => a.Mul(b);
             public static IData<T> operator *(float b, IData<T> a) => a.Mul(b);
             public static IData<T> operator /(IData<T> a, float b) => a.Div(b);
-            public static IData<T> operator +(IData<T> a, Vector3 b) => a.Add(b);
-            public static IData<T> operator +(Vector3 b, IData<T> a) => a.Add(b);
-            public static IData<T> operator -(IData<T> a, Vector3 b) => a.Sub(b);
 
             public abstract IData<T> Default { get; }
 
@@ -22,8 +19,6 @@ namespace Kovnir.Rope.Math
             protected abstract IData<T> Sub(IData<T> other);
             protected abstract IData<T> Mul(float other);
             protected abstract IData<T> Div(float other);
-            protected abstract IData<T> Add(Vector3 other);
-            protected abstract IData<T> Sub(Vector3 other);
             
             public abstract T GetData();
         }
