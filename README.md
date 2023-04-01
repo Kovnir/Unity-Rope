@@ -36,6 +36,9 @@ Here is how changing these parameters affects the behavior of the rope:
 
 ![Example](Doc/DynamicsParamsExample.gif)
 
+You can make smooth following in the same way. An example of it is also included in the repository.
+
+![Example](Doc/SmoothFollowing.gif)
 
 ## P.S.
 
