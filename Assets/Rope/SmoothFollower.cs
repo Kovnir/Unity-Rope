@@ -1,6 +1,5 @@
 using Kovnir.Rope.Math;
 using UnityEngine;
-using Quaternion = System.Numerics.Quaternion;
 
 namespace Rope
 {
@@ -10,7 +9,7 @@ namespace Rope
         [SerializeField] private SecondOrderCalculatorParams dynamicsParams;
 
         Vector3SecondOrderCalculator positionCalculator;
-        QuaternionSecondOrderCalculator rotationCalculator;
+        Vector3SecondOrderCalculator rotationCalculator;
 
         void Awake()
         {
@@ -20,13 +19,13 @@ namespace Rope
         void InitDynamics()
         {
             positionCalculator = new Vector3SecondOrderCalculator(target.position, dynamicsParams);
-            rotationCalculator = new QuaternionSecondOrderCalculator(target.rotation, dynamicsParams);
+            rotationCalculator = new Vector3SecondOrderCalculator(target.forward, dynamicsParams);
         }
 
         void Update()
         {
             transform.position = positionCalculator.Update(Time.deltaTime, target.position);
-            transform.rotation = rotationCalculator.Update(Time.deltaTime, target.rotation);
+            transform.forward = rotationCalculator.Update(Time.deltaTime, target.forward);
         }
     }
 }
