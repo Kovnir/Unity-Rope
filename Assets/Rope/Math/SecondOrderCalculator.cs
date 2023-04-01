@@ -15,8 +15,9 @@ namespace Kovnir.Rope.Math
             public static IData<T> operator +(IData<T> a, Vector3 b) => a.Add(b);
             public static IData<T> operator +(Vector3 b, IData<T> a) => a.Add(b);
             public static IData<T> operator -(IData<T> a, Vector3 b) => a.Sub(b);
-            
-            public abstract Vector3 ToVector3();
+
+            public abstract IData<T> Default { get; }
+
             protected abstract IData<T> Add(IData<T> other);
             protected abstract IData<T> Sub(IData<T> other);
             protected abstract IData<T> Mul(float other);
@@ -63,7 +64,7 @@ namespace Kovnir.Rope.Math
 
         private IData<T> previousTarget;
         private IData<T> current;
-        private Vector3 currentVelocity;
+        private IData<T> currentVelocity;
         
         private Consts consts;
 
@@ -71,7 +72,7 @@ namespace Kovnir.Rope.Math
         {
             current = initial;
             previousTarget = initial;
-            currentVelocity = Vector3.zero;
+            currentVelocity = initial.Default;
 
             consts = Consts.Create(@params);
         }
@@ -87,10 +88,10 @@ namespace Kovnir.Rope.Math
         }
 
 
-        private static (IData<T> currentPosition, Vector3 currentVelocity) Update(
+        private static (IData<T> currentPosition, IData<T> currentVelocity) Update(
             float deltaTime,
             IData<T> targetPosition, IData<T> previousTargetPosition,
-            IData<T> currentPosition, Vector3 currentVelocity,
+            IData<T> currentPosition, IData<T> currentVelocity,
             Consts consts)
         {
             IData<T> targetVelocity = (targetPosition - previousTargetPosition) / deltaTime; //estimate velocity
@@ -121,7 +122,7 @@ namespace Kovnir.Rope.Math
                                (targetPosition + consts.k3 * targetVelocity - currentPosition -
                                 k1Stable * currentVelocity) /
                                k2Stable; //integrate velocity by acceleration
-            currentVelocity = velocity.ToVector3();
+            currentVelocity = velocity;
             return (currentPosition, currentVelocity);
         }
     }

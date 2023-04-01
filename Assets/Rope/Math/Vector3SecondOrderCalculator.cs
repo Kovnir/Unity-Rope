@@ -13,7 +13,7 @@ namespace Kovnir.Rope.Math
                 this.value = value;
             }
 
-            public Vector3 ToVector3() => value;
+            public IData<Vector3> Default => new Vector3Data(Vector3.zero);
 
             IData<Vector3> IData<Vector3>.Add(IData<Vector3> other)
             {

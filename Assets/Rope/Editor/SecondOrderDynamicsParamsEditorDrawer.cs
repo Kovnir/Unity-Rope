@@ -122,7 +122,7 @@ namespace Kovnir.Rope.Editor
             Vector3SecondOrderCalculator.Vector3Data targetPosition = new(new(0, 1.5f, 0));
             Vector3SecondOrderCalculator.Vector3Data prevTargetPosition = new(new(0, 1.5f, 0));
             Vector3SecondOrderCalculator.Vector3Data currPosition = new(new(0, 1.5f, 0));
-            Vector3 currVelocity = new(0, 0, 0);
+            Vector3SecondOrderCalculator.Vector3Data currVelocity = new(new(0, 0, 0));
 
             Vector2[] points = new Vector2[(int)clipRect.width];
             for (int i = 0; i < (int)clipRect.width; i++)
@@ -139,11 +139,14 @@ namespace Kovnir.Rope.Editor
                         currPosition, currVelocity, consts
                     });
 
-                (SecondOrderCalculator<Vector3>.IData<Vector3> position, Vector3 velocity) resultTuple =
-                    ((SecondOrderCalculator<Vector3>.IData<Vector3>, Vector3))callResult;
+                (SecondOrderCalculator<Vector3>.IData<Vector3> position,
+                    SecondOrderCalculator<Vector3>.IData<Vector3> velocity) resultTuple =
+                        ((SecondOrderCalculator<Vector3>.IData<Vector3>,
+                            SecondOrderCalculator<Vector3>.IData<Vector3>))
+                        callResult;
 
                 currPosition = (Vector3SecondOrderCalculator.Vector3Data)resultTuple.position;
-                currVelocity = resultTuple.velocity;
+                currVelocity = (Vector3SecondOrderCalculator.Vector3Data)resultTuple.velocity;
 
                 prevTargetPosition = targetPosition;
                 float currentPositionY = currPosition.GetData().y;
