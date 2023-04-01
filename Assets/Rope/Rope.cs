@@ -12,7 +12,7 @@ namespace Kovnir.Rope
         [SerializeField] private float length;
         [SerializeField] private int segmentsCount = 10;
         
-        [SerializeField] private SecondOrderCalculator.Params dynamicsParams;
+        [SerializeField] private SecondOrderCalculatorParams dynamicsParams;
 
 
         private LineRenderer lineRenderer;
@@ -20,7 +20,7 @@ namespace Kovnir.Rope
         private Vector3? ropeMiddlePrevious;
         private Vector3 ropeTarget;
 
-        SecondOrderCalculator calculator;
+        Vector3SecondOrderCalculator calculator;
 
         private void Awake()
         {
@@ -32,7 +32,7 @@ namespace Kovnir.Rope
 
         void InitDynamics()
         {
-            calculator = new SecondOrderCalculator(ropeMiddle, dynamicsParams);
+            calculator = new Vector3SecondOrderCalculator(ropeMiddle, dynamicsParams);
         }
 
         private void TryGetLineRenderer()

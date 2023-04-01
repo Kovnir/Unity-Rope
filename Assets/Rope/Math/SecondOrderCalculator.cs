@@ -1,24 +1,30 @@
-using System;
 using UnityEngine;
 
 namespace Kovnir.Rope.Math
 {
     //inspired by (stolen from) https://www.youtube.com/watch?v=KPoeNZZ6H4s
-    public sealed class SecondOrderCalculator
+    public abstract class SecondOrderCalculator<T> where T : struct
     {
-        [Serializable]
-        public struct Params
+        public interface IData<T> where T : struct
         {
-            public float Frequency;
-            public float Damping;
-            public float Response;
-
-            public Params(float frequency, float damping, float response)
-            {
-                Frequency = frequency;
-                Damping = damping;
-                Response = response;
-            }
+            public static IData<T> operator +(IData<T> a, IData<T> b) => a.Add(b);
+            public static IData<T> operator -(IData<T> a, IData<T> b) => a.Sub(b);
+            public static IData<T> operator *(IData<T> a, float b) => a.Mul(b);
+            public static IData<T> operator *(float b, IData<T> a) => a.Mul(b);
+            public static IData<T> operator /(IData<T> a, float b) => a.Div(b);
+            public static IData<T> operator +(IData<T> a, Vector3 b) => a.Add(b);
+            public static IData<T> operator +(Vector3 b, IData<T> a) => a.Add(b);
+            public static IData<T> operator -(IData<T> a, Vector3 b) => a.Sub(b);
+            
+            public abstract Vector3 ToVector3();
+            protected abstract IData<T> Add(IData<T> other);
+            protected abstract IData<T> Sub(IData<T> other);
+            protected abstract IData<T> Mul(float other);
+            protected abstract IData<T> Div(float other);
+            protected abstract IData<T> Add(Vector3 other);
+            protected abstract IData<T> Sub(Vector3 other);
+            
+            public abstract T GetData();
         }
 
         public struct Consts
@@ -30,7 +36,7 @@ namespace Kovnir.Rope.Math
             public float k2;
             public float k3;
 
-            public static Consts Create(Params @params)
+            public static Consts Create(SecondOrderCalculatorParams @params)
             {
                 float f = @params.Frequency;
                 float z = @params.Damping;
@@ -55,36 +61,39 @@ namespace Kovnir.Rope.Math
             }
         }
 
-        private Vector3 previousTargetPosition;
-        private Vector3 currentPosition;
+        private IData<T> previousTarget;
+        private IData<T> current;
         private Vector3 currentVelocity;
+        
         private Consts consts;
 
-        public SecondOrderCalculator(Vector3 initialPosition, Params @params)
+        public SecondOrderCalculator(IData<T> initial, SecondOrderCalculatorParams @params)
         {
-            currentPosition = initialPosition;
-            previousTargetPosition = initialPosition;
+            current = initial;
+            previousTarget = initial;
             currentVelocity = Vector3.zero;
 
             consts = Consts.Create(@params);
         }
 
-        public Vector3 Update(float deltaTime, Vector3 targetPosition)
+        public abstract T Update(float deltaTime, T targetPosition);
+
+        protected IData<T> Update(float deltaTime, IData<T> targetPosition)
         {
-            (currentPosition, currentVelocity) = Update(deltaTime, targetPosition, previousTargetPosition,
-                currentPosition, currentVelocity, consts);
-            previousTargetPosition = targetPosition;
-            return currentPosition;
+            (current, currentVelocity) = Update(deltaTime, targetPosition, previousTarget,
+                current, currentVelocity, consts);
+            previousTarget = targetPosition;
+            return current;
         }
 
 
-        private static (Vector3 currentPosition, Vector3 currentVelocity) Update(
+        private static (IData<T> currentPosition, Vector3 currentVelocity) Update(
             float deltaTime,
-            Vector3 targetPosition, Vector3 previousTargetPosition,
-            Vector3 currentPosition, Vector3 currentVelocity,
+            IData<T> targetPosition, IData<T> previousTargetPosition,
+            IData<T> currentPosition, Vector3 currentVelocity,
             Consts consts)
         {
-            Vector3 targetVelocity = (targetPosition - previousTargetPosition) / deltaTime; //estimate velocity
+            IData<T> targetVelocity = (targetPosition - previousTargetPosition) / deltaTime; //estimate velocity
 
             float k1Stable;
             float k2Stable;
@@ -108,10 +117,11 @@ namespace Kovnir.Rope.Math
             }
 
             currentPosition += deltaTime * currentVelocity; //integrate position by velocity
-            currentVelocity += deltaTime *
+            IData<T> velocity = currentVelocity + deltaTime *
                                (targetPosition + consts.k3 * targetVelocity - currentPosition -
                                 k1Stable * currentVelocity) /
                                k2Stable; //integrate velocity by acceleration
+            currentVelocity = velocity.ToVector3();
             return (currentPosition, currentVelocity);
         }
     }

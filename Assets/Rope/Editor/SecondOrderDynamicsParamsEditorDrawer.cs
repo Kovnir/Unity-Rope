@@ -1,3 +1,4 @@
+using System;
 using System.Reflection;
 using Kovnir.Rope.Math;
 using UnityEditor;
@@ -5,7 +6,7 @@ using UnityEngine;
 
 namespace Kovnir.Rope.Editor
 {
-    [CustomPropertyDrawer(typeof(SecondOrderCalculator.Params))]
+    [CustomPropertyDrawer(typeof(SecondOrderCalculatorParams))]
     public sealed class SecondOrderDynamicsParamsEditorDrawer : PropertyDrawer
     {
         private const int OFFSET = 2;
@@ -25,7 +26,7 @@ namespace Kovnir.Rope.Editor
             if (manualUpdate == null)
             {
                 manualUpdate =
-                    typeof(SecondOrderCalculator).GetMethod("Update",
+                    typeof(SecondOrderCalculator<Vector3>).GetMethod("Update",
                         BindingFlags.NonPublic | BindingFlags.Static);
             }
         }
@@ -47,7 +48,7 @@ namespace Kovnir.Rope.Editor
 
             EditorGUI.indentLevel++;
 
-            SecondOrderCalculator.Consts consts = DrawMainProperties(ref position, property);
+            Vector3SecondOrderCalculator.Consts consts = DrawMainProperties(ref position, property);
 
             position.y += EditorGUIUtility.singleLineHeight * 1.5f;
             position.height = GRAPH_SIZE;
@@ -62,7 +63,8 @@ namespace Kovnir.Rope.Editor
             EditorGUI.EndProperty();
         }
 
-        private static SecondOrderCalculator.Consts DrawMainProperties(ref Rect position, SerializedProperty property)
+        private static Vector3SecondOrderCalculator.Consts DrawMainProperties(ref Rect position,
+            SerializedProperty property)
         {
             var frequency = property.FindPropertyRelative("Frequency");
             var damping = property.FindPropertyRelative("Damping");
@@ -86,11 +88,11 @@ namespace Kovnir.Rope.Editor
                 damping.floatValue = 0.1f;
             }
 
-            return SecondOrderCalculator.Consts.Create(
-                new SecondOrderCalculator.Params(frequency.floatValue, damping.floatValue, response.floatValue));
+            return Vector3SecondOrderCalculator.Consts.Create(
+                new SecondOrderCalculatorParams(frequency.floatValue, damping.floatValue, response.floatValue));
         }
 
-        private void DrawGraph(SecondOrderCalculator.Consts consts, Material material, Rect clipRect)
+        private void DrawGraph(Vector3SecondOrderCalculator.Consts consts, Material material, Rect clipRect)
         {
             const int BORDER = 3;
 
@@ -117,9 +119,9 @@ namespace Kovnir.Rope.Editor
                 new Vector2(THRESHOLD + 1, 50 + 1), new Vector2(clipRect.width, 50 + 1));
 
 
-            Vector3 targetPosition = new(0, 1.5f, 0);
-            Vector3 prevTargetPosition = new(0, 1.5f, 0);
-            Vector3 currPosition = new(0, 1.5f, 0);
+            Vector3SecondOrderCalculator.Vector3Data targetPosition = new(new(0, 1.5f, 0));
+            Vector3SecondOrderCalculator.Vector3Data prevTargetPosition = new(new(0, 1.5f, 0));
+            Vector3SecondOrderCalculator.Vector3Data currPosition = new(new(0, 1.5f, 0));
             Vector3 currVelocity = new(0, 0, 0);
 
             Vector2[] points = new Vector2[(int)clipRect.width];
@@ -127,17 +129,24 @@ namespace Kovnir.Rope.Editor
             {
                 if (i > THRESHOLD)
                 {
-                    targetPosition = new(0, 0.5f, 0);
+                    targetPosition = new(new(0, 0.5f, 0));
                 }
 
-                (currPosition, currVelocity) = ((Vector3, Vector3))manualUpdate
+                object callResult = manualUpdate
                     .Invoke(null, new object[]
                     {
                         0.01f, targetPosition, prevTargetPosition,
                         currPosition, currVelocity, consts
                     });
+
+                (SecondOrderCalculator<Vector3>.IData<Vector3> position, Vector3 velocity) resultTuple =
+                    ((SecondOrderCalculator<Vector3>.IData<Vector3>, Vector3))callResult;
+
+                currPosition = (Vector3SecondOrderCalculator.Vector3Data)resultTuple.position;
+                currVelocity = resultTuple.velocity;
+
                 prevTargetPosition = targetPosition;
-                float currentPositionY = currPosition.y;
+                float currentPositionY = currPosition.GetData().y;
                 points[i] = new Vector2(BORDER + i, currentPositionY * 100);
             }
 
